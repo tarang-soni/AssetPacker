@@ -18,8 +18,7 @@ namespace TUtils {
         AssetPacker(std::string path, int version);
         virtual ~AssetPacker() = default;
         void pack();
-    private:
-        const char* getPackerID();
+
 
     };
 } // TUtils

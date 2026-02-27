@@ -37,7 +37,7 @@ namespace TUtils
         }
         std::ofstream file("pack.dat",std::ios::binary);
         if (file.is_open()) {
-            file.write(getPackerID(),sizeof(getPackerID()));
+            file.write(PACKER_ID,sizeof(PACKER_ID));
             file.write(reinterpret_cast<const char*>(&version),sizeof(version));
             file.write(reinterpret_cast<const char*>(&count),sizeof(count));
             for (auto& entry:entries) {
@@ -58,10 +58,5 @@ namespace TUtils
                 file.write(buffer.data(),size);
             }
         }
-
-    }
-
-    const char* AssetPacker::getPackerID() {
-        return PACKER_ID;
     }
 } // TUtils
