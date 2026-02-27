@@ -4,6 +4,7 @@
 
 #ifndef ASSETPACKER_ASSETENTRY_H
 #define ASSETPACKER_ASSETENTRY_H
+#include <cstring>
 #include <string>
 #include <utility>
 #include <vector>
@@ -12,11 +13,13 @@ namespace TUtils
 {
     struct AssetEntry {
         public:
-            std::string path;
+            char path[128];
             uintmax_t size;
-            std::vector<char> buffer;
             uintmax_t offset{};
-        AssetEntry(std::string path, const uintmax_t size,const uintmax_t offset):path(std::move(path)),size(size),offset(offset) {}
+        AssetEntry(const char* _path, const uintmax_t size,const uintmax_t offset):size(size),offset(offset) {
+            std::strncpy(path,_path,127);
+            path[127] ='\0';
+        }
     };
 }
 #endif //ASSETPACKER_ASSETENTRY_H
