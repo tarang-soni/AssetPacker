@@ -9,7 +9,6 @@ src/AssetPacker.cpp
 )
 add_executable(${PROJECT_NAME}
         src/main.cpp
-        src/AssetPacker.cpp
 )
 
 target_include_directories(AssetPackerTool PUBLIC

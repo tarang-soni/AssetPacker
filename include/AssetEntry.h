@@ -4,10 +4,10 @@
 
 #ifndef ASSETPACKER_ASSETENTRY_H
 #define ASSETPACKER_ASSETENTRY_H
+#include<cstdint>
 #include <cstring>
 #include <string>
 #include <utility>
-#include <vector>
 #include <algorithm>
 #include <cctype>
 namespace TUtils
