@@ -14,28 +14,14 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    TUtils::AssetPacker packer(argc,argv);
-    return 0;
-    ifstream file("pack.dat", ios::binary);
-    if (!file.is_open())
-    {
-        cerr << "Error opening file" << endl;
-        return 1;
-    }
+    TUtils::AssetPacker packer;
+    packer.init("pack.dat");
+    //packer.pack("./assets","pack.dat","0.0.1");
 
-    file.seekg(8, ios::beg);
-    int fileCnt = 0;
-    file.read(reinterpret_cast<char *>(&fileCnt), sizeof(fileCnt));
-    cout << "File Count: " << fileCnt << endl;
-    uintmax_t fileSize, fileOffset;
-    char path[128];
-    file.read(reinterpret_cast<char *>(&path), sizeof(path));
-    file.read(reinterpret_cast<char *>(&fileSize), sizeof(fileSize));
-    file.read(reinterpret_cast<char *>(&fileOffset), sizeof(fileOffset));
 
-    std::pmr::vector<unsigned char> buffer(19460);
-    file.seekg(fileOffset, ios::beg);
-    file.read(reinterpret_cast<char *>(buffer.data()), fileSize);
+
+    std::vector<unsigned char> buffer = packer.getData("./assets/test.png");
+
     int width, height, channels;
     unsigned char *imageData = stbi_load_from_memory(buffer.data(), buffer.size(), &width, &height, &channels, 0);
     if (imageData != nullptr)
