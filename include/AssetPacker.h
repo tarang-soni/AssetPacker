@@ -35,7 +35,7 @@ namespace TUtils
     private:
         const char PACKER_ID[4] = {'P', 'A', 'K', '1'};
         std::unordered_map<std::string, PathData> assetPackMap;
-
+        std::string filePath;
     public:
         //AssetPacker.exe --i "assets/" --o "/asset.dat"
         AssetPacker(int argc, char **argv);

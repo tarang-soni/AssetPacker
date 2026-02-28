@@ -19,7 +19,6 @@ int main(int argc, char **argv)
     //packer.pack("./assets","pack.dat","0.0.1");
 
 
-
     std::vector<unsigned char> buffer = packer.getData("./assets/test.png");
 
     int width, height, channels;
