@@ -11,14 +11,17 @@
 
 namespace TUtils
 {
-    struct AssetEntry {
-        public:
-            char path[128];
-            uintmax_t size;
-            uintmax_t offset{};
-        AssetEntry(const char* _path, const uintmax_t size,const uintmax_t offset):size(size),offset(offset) {
-            std::strncpy(path,_path,127);
-            path[127] ='\0';
+    struct AssetEntry
+    {
+    public:
+        char path[128];
+        uintmax_t size;
+        uintmax_t offset{};
+
+        AssetEntry(const char *_path, const uintmax_t size, const uintmax_t offset) : size(size), offset(offset)
+        {
+            std::strncpy(path, _path, 127);
+            path[127] = '\0';
         }
     };
 }

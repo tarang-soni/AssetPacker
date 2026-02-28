@@ -6,7 +6,8 @@
 #define ASSETPACKER_ASSETPACKER_H
 #include <string>
 
-namespace TUtils {
+namespace TUtils
+{
     class AssetPacker
     {
     private:
@@ -16,11 +17,16 @@ namespace TUtils {
     public:
         //AssetPacker.exe --i "assets/" --o "/asset.dat"
         AssetPacker(std::string path, int version);
+
         virtual ~AssetPacker() = default;
+
         void pack();
+<<<<<<< Updated upstream
     private:
         const char* getPackerID();
 
+=======
+>>>>>>> Stashed changes
     };
 } // TUtils
 
