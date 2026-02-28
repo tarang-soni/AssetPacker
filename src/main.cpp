@@ -1,22 +1,28 @@
+
+#include <cstdint>
 #include  <iostream>
+#include <vector>
+#include <fstream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include "AssetPacker.h"
-
 using namespace std;
 
 int main(int argc, char **argv)
 {
-<<<<<<< Updated upstream
-    TUtils::AssetPacker packer("assets",0);
-=======
-    TUtils::AssetPacker packer("assets", 0);
-
+    TUtils::AssetPacker packer(argc,argv);
+    return 0;
     ifstream file("pack.dat", ios::binary);
     if (!file.is_open())
     {
         cerr << "Error opening file" << endl;
         return 1;
     }
+
     file.seekg(8, ios::beg);
     int fileCnt = 0;
     file.read(reinterpret_cast<char *>(&fileCnt), sizeof(fileCnt));
@@ -27,7 +33,7 @@ int main(int argc, char **argv)
     file.read(reinterpret_cast<char *>(&fileSize), sizeof(fileSize));
     file.read(reinterpret_cast<char *>(&fileOffset), sizeof(fileOffset));
 
-    std::vector<unsigned char> buffer(19460);
+    std::pmr::vector<unsigned char> buffer(19460);
     file.seekg(fileOffset, ios::beg);
     file.read(reinterpret_cast<char *>(buffer.data()), fileSize);
     int width, height, channels;
@@ -54,6 +60,5 @@ int main(int argc, char **argv)
     {
         std::cerr << "STB failed to decode the image data." << std::endl;
     }
->>>>>>> Stashed changes
     return 0;
 }

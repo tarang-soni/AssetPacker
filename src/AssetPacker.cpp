@@ -8,82 +8,99 @@
 #include <iostream>
 
 #include "AssetEntry.h"
-//TODO: move the packing logic in its own function. it will execute only if i type commmands like pack --i "path" --o "path"
-//TODO: create a separate file to just store the stride values for all the data types
-
-/*TODO:
-    create unpacker logic in which it will detect if its packed using the same class by comparing packer_id
-    it parse it and store the table of content part in a hashmap which will be easier to find the images or anything stored in it
-*/
-//TODO: create a getData function which will take a path as input and find it in hashmap. it will do its logic that is use size and offset to pinpoint the data and return the buffered vector
+#include <algorithm>
 namespace TUtils
 {
-    AssetPacker::AssetPacker(std::string path, int version) : _ver(version)
+    AssetPacker::AssetPacker(int argc, char **argv)
+    {
+        //AssetPacker.exe --i "assets/" --o "/asset.dat" --v 0.0.1
+        std::string in_path;
+        std::string out_path;
+        char* version;
+        for (int i=1;i<argc;i++)
+        {
+            std::string arg = argv[i];
+            if (arg == "--i" && i+1 < argc)
+            {
+                in_path = argv[++i];
+            }
+            else if (arg == "--o" && i+1 < argc)
+            {
+                out_path = argv[++i];
+            }
+            else if (arg == "--v" && i+1 < argc)
+            {
+                std::string s =argv[++i];
+                std::erase(s,'.');
+                for (int i=0;i<3;i++)
+                {
+                    version[i] = s[i];
+                }
+            }
+        }
+        if (argc>1)
+        {
+            pack(in_path, out_path, version);
+        }
+    }
+    void AssetPacker::pack(const std::string& in_path,const std::string& out_path,const char version[3]) const
     {
         int count = 0;
         uintmax_t header_size = sizeof(PACKER_ID) + sizeof(version) + sizeof(count);
         uintmax_t offset = 0;
 
         std::vector<AssetEntry> entries;
-        for (auto &dir_entry: std::filesystem::directory_iterator(path))
-        {
+        for (auto &dir_entry: std::filesystem::directory_iterator(in_path)) {
             if (std::filesystem::is_regular_file(dir_entry)) count++;
         }
         offset += header_size + (count * sizeof(AssetEntry));
-        for (auto &dir_entry: std::filesystem::directory_iterator(path))
-        {
+        for (auto &dir_entry: std::filesystem::directory_iterator(in_path)) {
             uintmax_t size = std::filesystem::file_size(dir_entry);
             AssetEntry entry((dir_entry.path().string().c_str()), size, offset);
             entries.push_back(entry);
             offset += size;
         }
-<<<<<<< Updated upstream
-        std::ofstream file("pack.dat",std::ios::binary);
-        if (file.is_open()) {
-            file.write(getPackerID(),sizeof(getPackerID()));
-            file.write(reinterpret_cast<const char*>(&version),sizeof(version));
-            file.write(reinterpret_cast<const char*>(&count),sizeof(count));
-            for (auto& entry:entries) {
-                file.write(reinterpret_cast<const char *>(entry.path),sizeof(entry.path));
-                file.write(reinterpret_cast<const char *>(&entry.size),sizeof(entry.size));
-                file.write(reinterpret_cast<const char *>(&entry.offset),sizeof(entry.offset));
-=======
-        for (auto &entry: entries)
-        {
-            std::cout << " path:" << entry.path << " size:" << entry.size << " offset:" << entry.offset << std::endl;
-        }
         std::ofstream file("pack.dat", std::ios::binary);
-        if (file.is_open())
-        {
+        if (file.is_open()) {
             file.write(PACKER_ID, sizeof(PACKER_ID));
             file.write(reinterpret_cast<const char *>(&version), sizeof(version));
             file.write(reinterpret_cast<const char *>(&count), sizeof(count));
-            for (auto &entry: entries)
-            {
+            for (auto &entry: entries) {
                 file.write(reinterpret_cast<const char *>(entry.path), sizeof(entry.path));
                 file.write(reinterpret_cast<const char *>(&entry.size), sizeof(entry.size));
                 file.write(reinterpret_cast<const char *>(&entry.offset), sizeof(entry.offset));
->>>>>>> Stashed changes
-            }
-            for (auto &entry: entries)
-            {
-                std::ifstream filestream(entry.path, std::ios::binary | std::ios::ate);
-                if (!filestream.is_open())
-                {
-                    std::cerr << "CRITICAL ERROR: Failed to open " << entry.path << std::endl;
-                    return;
+
+                for (auto &asset_entry: entries) {
+                    std::cout << " path:" << asset_entry.path << " size:" << asset_entry.size << " offset:" <<
+                            asset_entry.offset << std::endl;
                 }
-                auto size = filestream.tellg();
-                filestream.seekg(0, std::ios::beg);
-                std::vector<char> buffer(size);
-                filestream.read(buffer.data(), size);
-                file.write(buffer.data(), size);
+                std::ofstream basic_ofstream(out_path, std::ios::binary);
+                if (basic_ofstream.is_open()) {
+                    basic_ofstream.write(PACKER_ID, sizeof(PACKER_ID));
+                    basic_ofstream.write(reinterpret_cast<const char *>(&version), sizeof(version));
+                    basic_ofstream.write(reinterpret_cast<const char *>(&count), sizeof(count));
+                    for (auto &asset_entry: entries) {
+                        basic_ofstream.write(reinterpret_cast<const char *>(asset_entry.path),
+                                             sizeof(asset_entry.path));
+                        basic_ofstream.write(reinterpret_cast<const char *>(&asset_entry.size),
+                                             sizeof(asset_entry.size));
+                        basic_ofstream.write(reinterpret_cast<const char *>(&asset_entry.offset),
+                                             sizeof(asset_entry.offset));
+                    }
+                    for (auto &asset_entry: entries) {
+                        std::ifstream filestream(asset_entry.path, std::ios::binary | std::ios::ate);
+                        if (!filestream.is_open()) {
+                            std::cerr << "CRITICAL ERROR: Failed to open " << asset_entry.path << std::endl;
+                            return;
+                        }
+                        auto size = filestream.tellg();
+                        filestream.seekg(0, std::ios::beg);
+                        std::vector<char> buffer(size);
+                        filestream.read(buffer.data(), size);
+                        basic_ofstream.write(buffer.data(), size);
+                    }
+                }
             }
         }
-
-    }
-
-    const char* AssetPacker::getPackerID() {
-        return PACKER_ID;
     }
 } // TUtils
